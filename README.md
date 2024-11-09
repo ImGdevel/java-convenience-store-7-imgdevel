@@ -1,1 +1,1 @@
-# java-convenience-store-imgdevel
+# java-convenience-store-precourse

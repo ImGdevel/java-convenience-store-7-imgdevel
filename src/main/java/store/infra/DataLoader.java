@@ -12,13 +12,17 @@ import java.util.List;
 
 public class DataLoader {
 
-    private final String PRODUCT_PATH = "src/main/resources/products.md";
-    private final String PROMOTION_PATH = "src/main/resources/promotions.md";
+    private String productDataPath;
+    private String promotionDataPath;
 
+    public DataLoader(String productDataPath, String promotionDataPath){
+        this.productDataPath = productDataPath;
+        this.promotionDataPath = promotionDataPath;
+    }
 
     public List<Product> loadProduct() throws IOException {
         List<Product> products = new ArrayList<>();
-        List<String> lines = Files.readAllLines(Path.of(PRODUCT_PATH));
+        List<String> lines = Files.readAllLines(Path.of(productDataPath));
 
         for (String line : lines) {
             if (line.isBlank() || line.startsWith("name")) continue;
@@ -37,7 +41,7 @@ public class DataLoader {
 
     public List<Promotion> loadPromotions() throws IOException {
         List<Promotion> promotions = new ArrayList<>();
-        List<String> lines = Files.readAllLines(Path.of(PROMOTION_PATH));
+        List<String> lines = Files.readAllLines(Path.of(promotionDataPath));
 
         for (String line : lines) {
             if (line.isBlank() || line.startsWith("name")) continue;

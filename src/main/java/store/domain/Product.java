@@ -4,9 +4,9 @@ public class Product {
     private String name;
     private int price;
     private int stock;
-    private Promotion promotion;
+    private String promotion;
 
-    public Product(String name, int price, int stock, Promotion promotion) {
+    public Product(String name, int price, int stock, String promotion) {
         this.name = name;
         this.price = price;
         this.stock = stock;
@@ -21,13 +21,13 @@ public class Product {
     public int getStock() {
         return stock;
     }
-    public Promotion getPromotion(){
+    public String getPromotion(){
         return promotion;
     }
 
     @Override
     public String toString() {
-        return String.format("%s %,d원 %d개 %s", name, price, stock, promotion != null ? promotion.getName() : "");
+        return String.format("%s %,d원 %d개 %s", name, price, stock, promotion != null ? promotion : "");
     }
 
     public void reduceStock(int quantity) {

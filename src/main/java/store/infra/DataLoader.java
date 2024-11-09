@@ -27,7 +27,7 @@ public class DataLoader {
             String name = fields[0];
             int price = Integer.parseInt(fields[1]);
             int quantity = Integer.parseInt(fields[2]);
-            Promotion promotion = null; // todo : 프로모션은 어떻게 처리? Enum?
+            String promotion = fields[3].equals("null") ? null : fields[3];
 
             products.add(new Product(name, price, quantity, promotion));
         }

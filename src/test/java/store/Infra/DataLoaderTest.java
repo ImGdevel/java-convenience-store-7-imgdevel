@@ -65,4 +65,20 @@ class DataLoaderTest {
         assertThat(promo.getEndDateToString()).isEqualTo("2024-12-31");
     }
 
+    @Test
+    void 잘못된_상품_데이터로_예외_발생() throws IOException {
+        Files.writeString(productFile, "invalid,data");
+
+        assertThrows(NumberFormatException.class, () -> dataLoader.loadProduct());
+    }
+
+    @Test
+    void 잘못된_날짜로_예외_발생() throws IOException {
+        Files.writeString(promotionFile, """
+            name,buy,get,start_date,end_date
+            탄산2+1,2,1,invalid-date,2024-12-31
+            """);
+
+        assertThrows(DateTimeParseException.class, () -> dataLoader.loadPromotions());
+    }
 }

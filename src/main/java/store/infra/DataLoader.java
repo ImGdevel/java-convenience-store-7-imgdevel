@@ -31,7 +31,10 @@ public class DataLoader {
             String name = fields[0];
             int price = Integer.parseInt(fields[1]);
             int quantity = Integer.parseInt(fields[2]);
-            String promotion = fields[3].equals("null") ? null : fields[3];
+            String promotion = null;
+            if (!fields[3].equals("null")) {
+                promotion = fields[3];
+            }
 
             products.add(new Product(name, price, quantity, promotion));
         }

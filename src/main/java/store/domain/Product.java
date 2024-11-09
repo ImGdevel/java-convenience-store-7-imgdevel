@@ -28,7 +28,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return String.format("%s %,d원 %d개 %s", name, price, stock, promotion != null ? promotion : "");
+        return String.format("%s %,d원 %d개%s", name, price, stock, promotion != null ? " " + promotion : "");
     }
 
     public void reduceStock(int quantity) {

@@ -28,19 +28,19 @@ public class Promotion {
         this.endDate = endDate;
     }
 
-    String getName(){
+    public String getName() {
         return name;
     }
-    int getPurchaseQuantity(){
+    public int getPurchaseQuantity(){
         return purchaseQuantity;
     }
-    int getRewardQuantity(){
+    public int getRewardQuantity(){
         return rewardQuantity;
     }
-    String getStartDateToString(){
+    public String getStartDateToString(){
         return startDate.format(formatter);
     }
-    String getEndDateToString(){
+    public String getEndDateToString(){
         return endDate.format(formatter);
     }
 }

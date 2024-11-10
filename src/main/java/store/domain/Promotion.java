@@ -43,4 +43,10 @@ public class Promotion {
     public String getEndDateToString(){
         return endDate.format(formatter);
     }
+
+    public boolean isPromotionActive(LocalDate date) {
+        return (date.isEqual(startDate) || date.isAfter(startDate)) && date.isBefore(endDate);
+    }
+
+
 }

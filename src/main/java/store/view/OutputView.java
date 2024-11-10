@@ -1,6 +1,7 @@
 package store.view;
 
 import store.domain.Product;
+import store.domain.ProductOrder;
 import store.domain.Receipt;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class OutputView {
 
     public void displayWelcomeMessage() {
         System.out.println("안녕하세요. W편의점입니다.");
-        System.out.println("현재 보유하고 있는 상품입니다.");
+        System.out.println("현재 보유하고 있는 상품입니다.\n");
     }
 
     public void displayProductList(List<Product> products){
@@ -24,6 +25,26 @@ public class OutputView {
 
     public void displayPromotionLimitWarning(String productName, int quantity) {
         System.out.printf("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)%n", productName, quantity);
+    }
+
+    public void displayReceipt(Receipt receipt) {
+        System.out.println("==============W 편의점================");
+        System.out.format("%-15s%-8s%-8s%n", "상품명", "수량", "금액");
+
+        for (ProductOrder item : receipt.getPurchasedItems()) {
+            System.out.format("%-15s%-8d%-8d%n", item.getProductName(), item.getQuantity(), item.getQuantity() * item.getQuantity() /* Use actual price from product */);
+        }
+
+        System.out.println("=============증 정===============");
+        for (ProductOrder item : receipt.getFreeItems()) {
+            System.out.format("%-15s%-8d%n", item.getProductName(), item.getQuantity());
+        }
+
+        System.out.println("====================================");
+        System.out.format("총구매액\t\t\t%d%n", receipt.getTotalAmount());
+        System.out.format("행사할인\t\t\t-%d%n", receipt.getPromotionDiscount());
+        System.out.format("멤버십할인\t\t-%d%n", receipt.getMembershipDiscount());
+        System.out.format("내실돈\t\t\t%d%n", receipt.getFinalAmount());
     }
 
     public void displayError(String message) {

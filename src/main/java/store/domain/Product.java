@@ -72,4 +72,25 @@ public class Product {
             this.regularStock -= quantity;
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+
+        if (promotionStock > 0 && promotion != null) {
+            result.append(String.format("- %s %,d원 %d개 %s\n", name, price, promotionStock, promotion));
+        } else if (promotion != null) {
+            // 프로모션이 있지만 프로모션 재고가 없는 경우
+            result.append(String.format("- %s %,d원 재고 없음 %s\n", name, price, promotion));
+        }
+
+        if (regularStock > 0) {
+            result.append(String.format("- %s %,d원 %d개", name, price, regularStock));
+        } else {
+            result.append(String.format("- %s %,d원 재고 없음", name, price));
+        }
+
+        return result.toString();
+    }
+
 }

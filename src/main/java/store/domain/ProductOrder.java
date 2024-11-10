@@ -31,4 +31,11 @@ public class ProductOrder {
         this.quantity += additionalQuantity;
     }
 
+    public void reduceQuantity(int amount) {
+        if (amount <= 0 || amount > quantity) {
+            throw new IllegalArgumentException("추가 수량은 음수가 될 수 없습니다.");
+        }
+        this.quantity -= amount;
+    }
+
 }

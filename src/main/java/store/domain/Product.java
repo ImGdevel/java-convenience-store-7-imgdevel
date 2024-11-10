@@ -3,45 +3,65 @@ package store.domain;
 public class Product {
     private String name;
     private int price;
-    private int stock;
+    private int regularStock;
+    private int promotionStock;
     private String promotion;
 
-    public Product(String name, int price, int stock, String promotion) {
+    public Product(String name, int price) {
         this.name = name;
         this.price = price;
-        this.stock = stock;
-        this.promotion = promotion;
+        this.regularStock = 0;
+        this.promotionStock = 0;
+        this.promotion = null;
     }
 
     public String getName() {
         return name;
     }
+
     public int getPrice() {
         return price;
     }
-    public int getStock() {
-        return stock;
+
+    public int getRegularStock() {
+        return regularStock;
     }
-    public String getPromotion(){
+
+    public int getPromotionStock() {
+        return promotionStock;
+    }
+
+    public void setRegularStock(int regularStock){
+        this.regularStock = regularStock;
+    }
+
+    public void setPromotionStock(int promotionStock) {
+        this.promotionStock = promotionStock;
+    }
+
+    public void setPromotion(String promotion){
+        this.promotion = promotion;
+    }
+
+    public String getPromotion() {
         return promotion;
     }
 
-    public boolean isPromotion() {
-        return promotion != null;
+    public boolean isPromotionAvailable() {
+        return promotion != null && promotionStock > 0;
     }
 
-    @Override
-    public String toString() {
-        if (stock <= 0) {
-            return String.format("%s %,d원 재고 없음%s", name, price, promotion != null ? " " + promotion : "");
+    public void reduceStock(int quantity, boolean isPromotion) {
+        if (isPromotion) {
+            if (quantity > promotionStock) {
+                throw new IllegalArgumentException();
+            }
+            this.promotionStock -= quantity;
+        } else {
+            if (quantity > regularStock) {
+                throw new IllegalArgumentException();
+            }
+            this.regularStock -= quantity;
         }
-        return String.format("%s %,d원 %d개%s", name, price, stock, promotion != null ? " " + promotion : "");
-    }
-
-    public void reduceStock(int quantity) {
-        if (quantity > stock) {
-            throw new IllegalArgumentException("재고 수량을 초과하여 구매할 수 없습니다.");
-        }
-        this.stock -= quantity;
     }
 }

@@ -8,14 +8,10 @@ public class Order {
     private List<ProductOrder> promotionalProductOrders;
     private boolean isMembershipApplied;
 
-    public Order(List<ProductOrder> totalProductOrders) {
+    public Order(List<ProductOrder> totalProductOrders, List<ProductOrder> promotionalProductOrders) {
         this.totalProductOrders = totalProductOrders;
-        this.promotionalProductOrders = new ArrayList<>();
-        this.isMembershipApplied = false;
-    }
-
-    public void setPromotionalProductOrders(List<ProductOrder> promotionalProductOrders){
         this.promotionalProductOrders = promotionalProductOrders;
+        this.isMembershipApplied = false;
     }
 
     public List<ProductOrder> getTotalProductOrders() {

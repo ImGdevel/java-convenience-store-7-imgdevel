@@ -37,5 +37,14 @@ class ProductTest {
 
         product.reduceStock(10);
         assertEquals(0, product.getStock());
+        assertEquals("콜라 1,000원 재고 없음 탄산2+1", product.toString());
+    }
+
+    @Test
+    void 재고_초과_차감_예외_확인() {
+        Product product = createProduct();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> product.reduceStock(11));
+        assertEquals("재고 수량을 초과하여 구매할 수 없습니다.", exception.getMessage());
     }
 }

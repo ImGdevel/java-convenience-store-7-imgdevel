@@ -1,7 +1,5 @@
 package store.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductOrder {
     private String productName;

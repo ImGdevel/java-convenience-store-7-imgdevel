@@ -1,6 +1,5 @@
 package store.infra;
 
-import store.domain.Product;
 import store.domain.Promotion;
 
 import java.io.IOException;
@@ -10,11 +9,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PromotionDataLoade {
+public class PromotionDataLoader {
 
     private String promotionDataPath;
 
-    public PromotionDataLoade(String promotionDataPath){
+    public PromotionDataLoader(String promotionDataPath){
         this.promotionDataPath = promotionDataPath;
     }
 

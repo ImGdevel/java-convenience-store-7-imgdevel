@@ -12,7 +12,7 @@ public class Promotion {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public Promotion(String name, int purchaseQuantity, int perQuantity, String startDate, String endDate){
+    public Promotion(String name, int purchaseQuantity, int rewardQuantity, String startDate, String endDate){
         this.name = name;
         this.purchaseQuantity = purchaseQuantity;
         this.rewardQuantity = rewardQuantity;

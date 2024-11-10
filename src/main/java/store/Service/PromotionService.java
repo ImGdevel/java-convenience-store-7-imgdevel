@@ -19,6 +19,32 @@ public class PromotionService {
         this.promotionManager = promotionManager;
     }
 
+    public List<ProductOrder> getPromotionProduct(List<ProductOrder> productOrders){
+        List<ProductOrder> products = new ArrayList<>();
+        LocalDate nowDate = LocalDate.now();
+
+        for (ProductOrder order : productOrders) {
+            Product product = inventoryManager.getProduct(order.getProductName());
+            if (!product.isPromotionAvailable()) {
+                continue;
+            }
+            Promotion promotion = promotionManager.getPromotion(product.getPromotion());
+            if (!promotion.isPromotionActive(nowDate)) {
+                continue;
+            }
+            // 프로모션이 적용가능한 개수
+            int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
+            int promotionQuantity = Math.min((order.getQuantity() / promotionalUnits), product.getPromotionStock());
+
+            products.add(new ProductOrder(product.getName(), promotionQuantity));
+        }
+
+        return products;
+    }
+
+
+
+
     public List<ProductOrder> checkFreePromotionProduct(List<ProductOrder> productOrders) {
         List<ProductOrder> products = new ArrayList<>();
         LocalDate nowDate = LocalDate.now();

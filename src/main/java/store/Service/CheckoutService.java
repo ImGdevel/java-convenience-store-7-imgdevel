@@ -24,33 +24,24 @@ public class CheckoutService {
     }
 
     private void updateStock(Order order) {
-        Map<String, Integer> promoOrderMap = createPromoOrderMap(order.getPromotionalProductOrders());
         for (ProductOrder totalOrder : order.getTotalProductOrders()) {
-            processStockForOrder(totalOrder, promoOrderMap);
+            processStockForOrder(totalOrder);
         }
     }
 
-    private Map<String, Integer> createPromoOrderMap(List<ProductOrder> promoOrders) {
-        Map<String, Integer> promoOrderMap = new HashMap<>();
-        for (ProductOrder promoOrder : promoOrders) {
-            promoOrderMap.put(promoOrder.getProductName(), promoOrder.getQuantity());
-        }
-        return promoOrderMap;
-    }
-
-    private void processStockForOrder(ProductOrder totalOrder, Map<String, Integer> promoOrderMap) {
+    private void processStockForOrder(ProductOrder totalOrder) {
         String productName = totalOrder.getProductName();
-        int primaryQuantity = calculatePrimaryQuantity(totalOrder.getQuantity(), productName, promoOrderMap);
-        reduceStock(productName, primaryQuantity, false);
+        int totalQuantity = totalOrder.getQuantity();
 
-        int promoQuantity = promoOrderMap.getOrDefault(productName, 0);
-        if (promoQuantity > 0) {
-            reduceStock(productName, promoQuantity, true);
+        int promoStock = inventoryManager.getProduct(productName).getPromotionStock();
+        int promoQuantity = Math.min(totalQuantity, promoStock);
+
+        reduceStock(productName, promoQuantity, true);
+
+        int remainingQuantity = totalQuantity - promoQuantity;
+        if (remainingQuantity > 0) {
+            reduceStock(productName, remainingQuantity, false);
         }
-    }
-
-    private int calculatePrimaryQuantity(int totalQuantity, String productName, Map<String, Integer> promoOrderMap) {
-        return totalQuantity - promoOrderMap.getOrDefault(productName, 0);
     }
 
     private void reduceStock(String productName, int quantity, boolean isPromotion) {

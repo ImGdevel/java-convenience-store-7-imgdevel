@@ -1,15 +1,18 @@
 package store.view;
 
 import camp.nextstep.edu.missionutils.Console;
+import store.domain.ProductOrder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.HashMap;
-import java.util.Map;
+
+
 
 public class InputView {
 
-    public Map<String, Integer> getPurchaseInput() {
+    public List<ProductOrder> getProductOrders() {
         System.out.println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])");
 
         while (true) {
@@ -22,8 +25,8 @@ public class InputView {
         }
     }
 
-    private Map<String, Integer> parseItems(String input) {
-        Map<String, Integer> items = new HashMap<>();
+    private List<ProductOrder> parseItems(String input) {
+        List<ProductOrder> items = new ArrayList<>();
         String[] itemInputs = input.split(",");
 
         for (String itemInput : itemInputs) {
@@ -33,15 +36,37 @@ public class InputView {
             }
             String itemName = matcher.group(1);
             int quantity = Integer.parseInt(matcher.group(2));
-            // todo : 존재하지 않는 상품을 입력한 경우
-            // todo : 구매 수량이 재고 수량을 초과한 경우
-            items.put(itemName, quantity);
+            items.add(new ProductOrder(itemName, quantity));
         }
         return items;
     }
 
 
+    public boolean confirmAction() {
+        while (true) {
+            String input = Console.readLine();
+            try {
+                return checkInput(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("[ERROR] " + e.getMessage());
+            }
+        }
+    }
 
+    public boolean applyMembershipDiscount() {
+        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+        return confirmAction();
+    }
 
+    public boolean continueShopping() {
+        System.out.println("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
+        return confirmAction();
+    }
 
+    private boolean checkInput(String input){
+        if (!input.equals("Y") && !input.equals("N")) {
+                throw new IllegalArgumentException("잘못된 입력입니다. 다시 입력해 주세요.");
+            }
+        return input.equals("Y");
+    }
 }

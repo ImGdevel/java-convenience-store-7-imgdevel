@@ -51,6 +51,14 @@ public class Product {
         return promotion != null && promotionStock > 0;
     }
 
+    public boolean isStockAvailable(int required){
+        int allStock = promotionStock + regularStock;
+        if(required <= allStock){
+            return true;
+        }
+        return false;
+    }
+
     public void reduceStock(int quantity, boolean isPromotion) {
         if (isPromotion) {
             if (quantity > promotionStock) {

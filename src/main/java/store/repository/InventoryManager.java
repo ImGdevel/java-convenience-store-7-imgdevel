@@ -27,7 +27,7 @@ public class InventoryManager {
     public Product getProduct(String productName) {
         Product product = inventory.get(productName);
         if (product == null) {
-            throw new NoSuchElementException("요청한 제품이 존재하지 않습니다: " + productName);
+            throw new IllegalArgumentException("존재하지 않는 상품입니다. 다시 입력해 주세요.");
         }
         return product;
     }
@@ -38,7 +38,7 @@ public class InventoryManager {
         try {
             product.reduceStock(quantity, isPromotion);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("재고 부족으로 인해 구매할 수 없습니다: " + productName);
+            throw new IllegalArgumentException("재고 부족으로 인해 구매할 수 없습니다");
         }
     }
 

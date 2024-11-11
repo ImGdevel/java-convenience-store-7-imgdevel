@@ -63,7 +63,11 @@ class PromotionServiceTest {
 
     @Test
     void 프로모션_상품_자동_적용_확인() {
-        List<ProductOrder> productOrders = List.of(new ProductOrder("콜라", 6), new ProductOrder("사이다", 3), new ProductOrder("초코바", 1));
+        List<ProductOrder> productOrders = List.of(
+                new ProductOrder("콜라", 6),
+                new ProductOrder("사이다", 3),
+                new ProductOrder("초코바", 1)
+        );
         List<ProductOrder> withoutPromotions = promotionService.getPromotionProduct(productOrders);
 
         assertEquals(2, withoutPromotions.size());
@@ -75,13 +79,37 @@ class PromotionServiceTest {
 
     @Test
     void 무료_프로모션_적용_상품_확인() {
-        List<ProductOrder> productOrders = List.of(new ProductOrder("콜라", 5), new ProductOrder("사이다", 6) );
+        List<ProductOrder> productOrders = List.of(
+                new ProductOrder("콜라", 5),
+                new ProductOrder("사이다", 2),
+                new ProductOrder("초코바", 2)
+        );
         List<ProductOrder> freePromotions = promotionService.checkFreePromotionProduct(productOrders);
 
 
-        assertEquals(1, freePromotions.size());
+        assertEquals(2, freePromotions.size());
         assertEquals("콜라", freePromotions.get(0).getProductName());
         assertEquals(1, freePromotions.get(0).getQuantity());
+        assertEquals("사이다", freePromotions.get(1).getProductName());
+        assertEquals(1, freePromotions.get(1).getQuantity());
+    }
+
+        @Test
+    void 프로모션_정가_구매_상품_확인() {
+        List<ProductOrder> productOrders = List.of(
+                new ProductOrder("콜라", 12),
+                new ProductOrder("사이다", 2),
+                new ProductOrder("초코바", 6),
+                new ProductOrder("오렌지주스", 1)
+        );
+        List<ProductOrder> freePromotions = promotionService.checkWithoutPromotionStock(productOrders);
+
+
+        assertEquals(2, freePromotions.size());
+        assertEquals("콜라", freePromotions.get(0).getProductName());
+        assertEquals(3, freePromotions.get(0).getQuantity());
+        assertEquals("초코바", freePromotions.get(1).getProductName());
+        assertEquals(2, freePromotions.get(1).getQuantity());
     }
 
 

@@ -68,7 +68,8 @@ public class PromotionService {
         Promotion promotion = promotionManager.getPromotion(product.getPromotion());
 
         int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
-        int promotionQuantity = Math.min(order.getQuantity() / promotionalUnits, product.getPromotionStock());
+        int orderQuantity = Math.min(order.getQuantity() ,  product.getPromotionStock());
+        int promotionQuantity = orderQuantity / promotionalUnits;
 
         return promotionQuantity;
     }
@@ -89,8 +90,7 @@ public class PromotionService {
 
     private boolean meetsPromotionRequirements(ProductOrder order, Promotion promotion) {
         int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
-        return order.getQuantity() / promotionalUnits > 0 &&
-               (order.getQuantity() + promotion.getRewardQuantity()) % promotionalUnits == 0;
+        return (order.getQuantity() + promotion.getRewardQuantity()) % promotionalUnits == 0;
     }
 
     private ProductOrder createFreePromotionOrder(ProductOrder order) {

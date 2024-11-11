@@ -37,6 +37,11 @@ public class Order {
         if (quantity <= 0) {
             throw new IllegalArgumentException(ErrorMessages.INVALID_RANGE);
         }
+        for (ProductOrder order : totalProductOrders) {
+            if (order.getProductName().equals(productName)) {
+                order.addQuantity(quantity);
+            }
+        }
 
         for (ProductOrder order : promotionalProductOrders) {
             if (order.getProductName().equals(productName)) {

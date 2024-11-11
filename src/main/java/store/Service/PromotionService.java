@@ -1,5 +1,6 @@
 package store.Service;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import store.domain.Product;
 import store.domain.ProductOrder;
 import store.domain.Promotion;
@@ -21,33 +22,19 @@ public class PromotionService {
 
     public List<ProductOrder> getPromotionProduct(List<ProductOrder> productOrders){
         List<ProductOrder> products = new ArrayList<>();
-        LocalDate nowDate = LocalDate.now();
+        LocalDate nowDate = DateTimes.now().toLocalDate();
 
         for (ProductOrder order : productOrders) {
-            Product product = inventoryManager.getProduct(order.getProductName());
-            if (!product.isPromotionAvailable()) {
-                continue;
-            }
-            Promotion promotion = promotionManager.getPromotion(product.getPromotion());
-            if (!promotion.isPromotionActive(nowDate)) {
-                continue;
-            }
-            // 프로모션이 적용가능한 개수
-            int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
-            int promotionQuantity = Math.min((order.getQuantity() / promotionalUnits), product.getPromotionStock());
-
-            products.add(new ProductOrder(product.getName(), promotionQuantity));
+            if (!isPromotionEligible(order, nowDate)) continue;
+            int promotionQuantity = calculatePromotionQuantity(order);
+            if (promotionQuantity > 0) products.add(new ProductOrder(order.getProductName(), promotionQuantity));
         }
-
         return products;
     }
 
-
-
-
     public List<ProductOrder> checkFreePromotionProduct(List<ProductOrder> productOrders) {
         List<ProductOrder> products = new ArrayList<>();
-        LocalDate nowDate = LocalDate.now();
+        LocalDate nowDate = DateTimes.now().toLocalDate();
 
         for (ProductOrder order : productOrders) {
             if (isEligibleForFreePromotion(order, nowDate)) {
@@ -59,7 +46,7 @@ public class PromotionService {
 
     public List<ProductOrder> checkWithoutPromotionStock(List<ProductOrder> productOrders) {
         List<ProductOrder> products = new ArrayList<>();
-        LocalDate nowDate = LocalDate.now();
+        LocalDate nowDate = DateTimes.now().toLocalDate();
 
         for (ProductOrder order : productOrders) {
             if (isEligibleForRegularPurchase(order, nowDate)) {
@@ -69,62 +56,71 @@ public class PromotionService {
         return products;
     }
 
+    private boolean isPromotionEligible(ProductOrder order, LocalDate nowDate) {
+        Product product = inventoryManager.getProduct(order.getProductName());
+        Promotion promotion = promotionManager.getPromotion(product.getPromotion());
+
+        return product.isPromotionAvailable() && promotion.isPromotionActive(nowDate);
+    }
+
+    private int calculatePromotionQuantity(ProductOrder order) {
+        Product product = inventoryManager.getProduct(order.getProductName());
+        Promotion promotion = promotionManager.getPromotion(product.getPromotion());
+
+        int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
+        int promotionQuantity = Math.min(order.getQuantity() / promotionalUnits, product.getPromotionStock());
+
+        return promotionQuantity;
+    }
 
     private boolean isEligibleForFreePromotion(ProductOrder order, LocalDate nowDate) {
         Product product = inventoryManager.getProduct(order.getProductName());
-        if (!product.isPromotionAvailable()) {
-            return false;
-        }
         Promotion promotion = promotionManager.getPromotion(product.getPromotion());
-        if (!promotion.isPromotionActive(nowDate) ||
-            !hasEnoughPromotionStock(order, product, promotion)) {
-            return false;
-        }
-        int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
-        if( order.getQuantity() / promotionalUnits == 0 ||
-                (order.getQuantity() + promotion.getRewardQuantity()) % promotionalUnits != 0 ){
-            return false;
-        }
-        return true;
+
+        return product.isPromotionAvailable() &&
+               promotion.isPromotionActive(nowDate) &&
+               hasEnoughPromotionStock(order, product, promotion) &&
+               meetsPromotionRequirements(order, promotion);
     }
 
     private boolean hasEnoughPromotionStock(ProductOrder order, Product product, Promotion promotion) {
         return product.getPromotionStock() >= (order.getQuantity() + promotion.getRewardQuantity());
     }
 
+    private boolean meetsPromotionRequirements(ProductOrder order, Promotion promotion) {
+        int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
+        return order.getQuantity() / promotionalUnits > 0 &&
+               (order.getQuantity() + promotion.getRewardQuantity()) % promotionalUnits == 0;
+    }
+
     private ProductOrder createFreePromotionOrder(ProductOrder order) {
         Product product = inventoryManager.getProduct(order.getProductName());
         int rewardQuantity = promotionManager.getPromotion(product.getPromotion()).getRewardQuantity();
+
         return new ProductOrder(product.getName(), rewardQuantity);
     }
 
     private boolean isEligibleForRegularPurchase(ProductOrder order, LocalDate nowDate) {
         Product product = inventoryManager.getProduct(order.getProductName());
-        if (!product.isPromotionAvailable()) {
-            return false;
-        }
         Promotion promotion = promotionManager.getPromotion(product.getPromotion());
-        if (!promotion.isPromotionActive(nowDate)) {
-            return false;
-        }
-        if(order.getQuantity() <= calculateMaxPromotionUnits(product, promotion)){
-            return false;
-        }
-        if(!product.isStockAvailable(promotion.getPurchaseQuantity() + promotion.getRewardQuantity())){
-            return false;
-        }
-        return true;
-    }
 
+        return product.isPromotionAvailable() &&
+               promotion.isPromotionActive(nowDate) &&
+               order.getQuantity() > calculateMaxPromotionUnits(product, promotion) &&
+               product.isStockAvailable(promotion.getPurchaseQuantity() + promotion.getRewardQuantity());
+    }
 
     private int calculateMaxPromotionUnits(Product product, Promotion promotion) {
         int promotionalUnits = promotion.getPurchaseQuantity() + promotion.getRewardQuantity();
         int maxPromotionApplies = product.getPromotionStock() / promotionalUnits;
+
         return maxPromotionApplies * promotionalUnits;
     }
 
     private ProductOrder createRegularPurchaseOrder(ProductOrder order) {
-        int regularPurchaseQuantity = order.getQuantity() - calculateMaxPromotionUnits(inventoryManager.getProduct(order.getProductName()), promotionManager.getPromotion(inventoryManager.getProduct(order.getProductName()).getPromotion()));
+        int regularPurchaseQuantity = order.getQuantity() -
+                                      calculateMaxPromotionUnits(inventoryManager.getProduct(order.getProductName()),
+                                                                 promotionManager.getPromotion(inventoryManager.getProduct(order.getProductName()).getPromotion()));
         return new ProductOrder(order.getProductName(), regularPurchaseQuantity);
     }
 }

@@ -1,9 +1,11 @@
 package store.controller;
 
+import store.Service.CheckoutService;
 import store.Service.InventoryService;
 import store.Service.PromotionService;
 import store.domain.Order;
 import store.domain.ProductOrder;
+import store.domain.Receipt;
 import store.infra.ProductDataLoader;
 import store.infra.PromotionDataLoader;
 import store.repository.InventoryManager;
@@ -29,6 +31,7 @@ public class ConvenienceStore {
 
     PromotionService promotionService;
     InventoryService inventoryService;
+    CheckoutService checkoutService;
 
     public ConvenienceStore(){
         this.inputView = new InputView();
@@ -42,6 +45,7 @@ public class ConvenienceStore {
 
         this.inventoryService = new InventoryService(inventoryManager);
         this.promotionService = new PromotionService(inventoryManager, promotionManager);
+        this.checkoutService = new CheckoutService(inventoryManager);
     }
 
     public void start(){
@@ -84,10 +88,8 @@ public class ConvenienceStore {
                 order.setMembershipApplied(true);
             }
 
-            System.out.println(order.getTotalProductOrders());
-            System.out.println(order.getPromotionalProductOrders());
-
-            // todo : 구매 결과 및 영수증 출력
+            Receipt receipt = checkoutService.processOrder(order);
+            outputView.displayReceipt(receipt);
 
             if(!inputView.continueShopping()){
                 break;

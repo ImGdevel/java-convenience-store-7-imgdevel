@@ -3,6 +3,7 @@ package store.Service;
 import store.domain.Product;
 import store.domain.ProductOrder;
 import store.repository.InventoryManager;
+import store.utils.ErrorMessages;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class InventoryService {
         for (ProductOrder order : productOrders) {
             Product product = inventoryManager.getProduct(order.getProductName());
             if (!product.isStockAvailable(order.getQuantity())) {
-                throw new IllegalArgumentException("재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(ErrorMessages.OUT_OF_STOCK);
             }
         }
     }

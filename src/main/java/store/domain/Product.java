@@ -1,5 +1,7 @@
 package store.domain;
 
+import store.utils.ErrorMessages;
+
 public class Product {
     private String name;
     private int price;
@@ -62,15 +64,16 @@ public class Product {
     public void reduceStock(int quantity, boolean isPromotion) {
         if (isPromotion) {
             if (quantity > promotionStock) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(ErrorMessages.OUT_OF_STOCK);
             }
             this.promotionStock -= quantity;
-        } else {
-            if (quantity > regularStock) {
-                throw new IllegalArgumentException();
-            }
-            this.regularStock -= quantity;
+            return;
         }
+        if (quantity > regularStock) {
+            throw new IllegalArgumentException(ErrorMessages.OUT_OF_STOCK);
+        }
+        this.regularStock -= quantity;
+
     }
 
     @Override

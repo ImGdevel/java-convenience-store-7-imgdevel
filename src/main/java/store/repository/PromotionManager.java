@@ -2,6 +2,7 @@ package store.repository;
 
 import store.domain.Promotion;
 import store.infra.PromotionDataLoader;
+import store.utils.ErrorMessages;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class PromotionManager {
             List<Promotion> promotionsList = dataLoader.loadPromotions();
             initializePromotions(promotionsList);
         } catch (IOException e) {
-            throw new IllegalStateException("프로모션 데이터를 로드하는 중 오류 발생", e);
+            throw new IllegalStateException(ErrorMessages.FAILED_INITIALIZE_PROMOTION, e);
         }
     }
 

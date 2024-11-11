@@ -53,7 +53,7 @@ public class OutputView {
     }
 
     public void displayError(String message) {
-        System.err.println(message);
+        System.out.println("[ERROR] " + message + " 다시 입력해 주세요.");
     }
 
 }

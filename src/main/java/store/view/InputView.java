@@ -2,6 +2,7 @@ package store.view;
 
 import camp.nextstep.edu.missionutils.Console;
 import store.domain.ProductOrder;
+import store.utils.ErrorMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class InputView {
             try {
                 return parseItems(input);
             } catch (IllegalArgumentException e) {
-                System.out.println("[ERROR] " + e.getMessage());
+                System.out.println("[ERROR] " + e.getMessage() + " 다시 입력해 주세요.");
             }
         }
     }
@@ -32,7 +33,7 @@ public class InputView {
         for (String itemInput : itemInputs) {
             Matcher matcher = Pattern.compile("\\[(.+)-(\\d+)]").matcher(itemInput.trim());
             if (!matcher.matches()) {
-                throw new IllegalArgumentException("올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(ErrorMessages.INVALID_FORMAT);
             }
             String itemName = matcher.group(1);
             int quantity = Integer.parseInt(matcher.group(2));
@@ -48,7 +49,7 @@ public class InputView {
             try {
                 return checkInput(input);
             } catch (IllegalArgumentException e) {
-                System.out.println("[ERROR] " + e.getMessage());
+                System.out.println("[ERROR] " + e.getMessage() +" 다시 입력해 주세요.");
             }
         }
     }
@@ -65,7 +66,7 @@ public class InputView {
 
     private boolean checkInput(String input){
         if (!input.equals("Y") && !input.equals("N")) {
-                throw new IllegalArgumentException("잘못된 입력입니다. 다시 입력해 주세요.");
+                throw new IllegalArgumentException(ErrorMessages.INVALID_INPUT);
             }
         return input.equals("Y");
     }

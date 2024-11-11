@@ -2,6 +2,7 @@ package store.repository;
 
 import store.domain.Product;
 import store.infra.ProductDataLoader;
+import store.utils.ErrorMessages;
 
 import java.io.IOException;
 import java.util.*;
@@ -19,7 +20,7 @@ public class InventoryManager {
             Map<String, Product> loadedProducts = dataLoader.loadProducts();
             inventory.putAll(loadedProducts);
         } catch (IOException e) {
-            throw new IllegalStateException("재고 초기화 중 오류 발생", e);
+            throw new IllegalStateException(ErrorMessages.FAILED_INITIALIZE_INVENTORY, e);
         }
     }
 
@@ -27,7 +28,7 @@ public class InventoryManager {
     public Product getProduct(String productName) {
         Product product = inventory.get(productName);
         if (product == null) {
-            throw new IllegalArgumentException("존재하지 않는 상품입니다. 다시 입력해 주세요.");
+            throw new IllegalArgumentException(ErrorMessages.PRODUCT_NOT_FOUND);
         }
         return product;
     }
@@ -38,7 +39,7 @@ public class InventoryManager {
         try {
             product.reduceStock(quantity, isPromotion);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("재고 부족으로 인해 구매할 수 없습니다");
+            throw new IllegalArgumentException(ErrorMessages.OUT_OF_STOCK);
         }
     }
 

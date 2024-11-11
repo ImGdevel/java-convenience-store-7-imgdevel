@@ -51,7 +51,7 @@ class InventoryManagerTest {
 
     @Test
     void 제품이_존재하지_않으면_예외_발생() {
-        assertThrows(NoSuchElementException.class, () -> inventoryManager.getProduct("사과주스"));
+        assertThrows(IllegalArgumentException.class, () -> inventoryManager.getProduct("사과주스"));
     }
 
     @Test

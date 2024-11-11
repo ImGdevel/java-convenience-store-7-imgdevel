@@ -100,6 +100,15 @@ class ApplicationTest extends NsTest {
             assertThat(output().replaceAll("\\s", "")).contains("내실돈1,800");
         });
     }
+
+    @Test
+    void 쇼핑_반복_테스트() {
+        assertSimpleTest(() -> {
+            run("[물-10]", "N", "Y", "[콜라-1]", "N", "N" );
+            assertThat(output()).contains("- 물 500원 재고 없음");
+        });
+    }
+
     @Test
     void 기간에_해당하지_않는_프로모션_적용() {
         assertNowTest(() -> {

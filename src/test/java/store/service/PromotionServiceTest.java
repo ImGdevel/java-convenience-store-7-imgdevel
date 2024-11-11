@@ -37,6 +37,8 @@ class PromotionServiceTest {
                 콜라,1000,10,탄산2+1
                 사이다,1000,7,탄산2+1
                 사이다,1000,3,null
+                초코바,1200,5,MD추천상품
+                초코바,1200,5,null
                 오렌지주스,1800,1,MD추천상품
                 사과주스,2000,10,반짝할인
                 """);
@@ -60,6 +62,18 @@ class PromotionServiceTest {
     }
 
     @Test
+    void 프로모션_상품_자동_적용_확인() {
+        List<ProductOrder> productOrders = List.of(new ProductOrder("콜라", 6), new ProductOrder("사이다", 3), new ProductOrder("초코바", 1));
+        List<ProductOrder> withoutPromotions = promotionService.getPromotionProduct(productOrders);
+
+        assertEquals(2, withoutPromotions.size());
+        assertEquals("콜라", withoutPromotions.get(0).getProductName());
+        assertEquals(2, withoutPromotions.get(0).getQuantity());
+        assertEquals("사이다", withoutPromotions.get(1).getProductName());
+        assertEquals(1, withoutPromotions.get(1).getQuantity());
+    }
+
+    @Test
     void 무료_프로모션_적용_상품_확인() {
         List<ProductOrder> productOrders = List.of(new ProductOrder("콜라", 5), new ProductOrder("사이다", 6) );
         List<ProductOrder> freePromotions = promotionService.checkFreePromotionProduct(productOrders);
@@ -70,17 +84,7 @@ class PromotionServiceTest {
         assertEquals(1, freePromotions.get(0).getQuantity());
     }
 
-    @Test
-    void 프로모션_재고_부족한_상품_확인() {
-        List<ProductOrder> productOrders = List.of(new ProductOrder("콜라", 12), new ProductOrder("사이다", 10));
-        List<ProductOrder> withoutPromotions = promotionService.checkWithoutPromotionStock(productOrders);
 
-        assertEquals(2, withoutPromotions.size());
-        assertEquals("콜라", withoutPromotions.get(0).getProductName());
-        assertEquals(3, withoutPromotions.get(0).getQuantity());
-        assertEquals("사이다", withoutPromotions.get(1).getProductName());
-        assertEquals(4, withoutPromotions.get(1).getQuantity());
-    }
 
     @Test
     void 프로모션_적용불가_상품_제고_부족() {

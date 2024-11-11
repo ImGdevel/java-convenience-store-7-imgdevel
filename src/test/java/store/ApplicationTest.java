@@ -46,6 +46,37 @@ class ApplicationTest extends NsTest {
     }
 
     @Test
+    void 미수령_프로모션_수령시() {
+        assertSimpleTest(() -> {
+            run("[콜라-2]", "Y", "N", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈2,000");
+        });
+    }
+
+    @Test
+    void 미수령_프로모션_미수령시() {
+        assertSimpleTest(() -> {
+            run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈18,300");
+        });
+    }
+
+    @Test
+    void 프로모션_미적용_상품_정가_구입() {
+        assertSimpleTest(() -> {
+            run("[콜라-12]", "Y", "N", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈9,000");
+        });
+    }
+
+    @Test
+    void 프로모션_미적용_상품_정가_미구입() {
+        assertSimpleTest(() -> {
+            run("[콜라-12]", "N", "N", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈6,000");
+        });
+    }
+    @Test
     void 기간에_해당하지_않는_프로모션_적용() {
         assertNowTest(() -> {
             run("[감자칩-2]", "N", "N");

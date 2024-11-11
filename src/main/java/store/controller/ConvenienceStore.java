@@ -98,7 +98,7 @@ public class ConvenienceStore {
 
     private void suggestPromotion(Order order, ProductOrder productOrder) {
         outputView.displayPromotionSuggestion(productOrder.getProductName(), productOrder.getQuantity());
-        if (inputView.continueShopping()) {
+        if (inputView.confirmAction()) {
             order.addPromotionalProductOrder(productOrder.getProductName(), productOrder.getQuantity());
         }
     }
@@ -110,7 +110,7 @@ public class ConvenienceStore {
 
     private void handleStockLimit(Order order, ProductOrder productOrder) {
         outputView.displayPromotionLimitWarning(productOrder.getProductName(), productOrder.getQuantity());
-        if (!inputView.continueShopping()) {
+        if (!inputView.confirmAction()) {
             order.reduceTotalProductOrder(productOrder.getProductName(), productOrder.getQuantity());
         }
     }

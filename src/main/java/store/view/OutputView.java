@@ -3,6 +3,7 @@ package store.view;
 import store.domain.Product;
 import store.domain.ProductOrder;
 import store.domain.Receipt;
+import store.domain.ReceiptProduct;
 
 import java.util.List;
 
@@ -31,12 +32,12 @@ public class OutputView {
         System.out.println("==============W 편의점================");
         System.out.format("%-15s%-8s%-8s%n", "상품명", "수량", "금액");
 
-        for (ProductOrder item : receipt.getPurchasedItems()) {
-            System.out.format("%-15s%-8d%-8d%n", item.getProductName(), item.getQuantity(), item.getQuantity() * item.getQuantity() /* Use actual price from product */);
+        for (ReceiptProduct item : receipt.getPurchasedItems()) {
+            System.out.format("%-15s%-8d%-8d%n", item.getProductName(), item.getQuantity(), item.getQuantity() * item.getPrice());
         }
 
         System.out.println("=============증 정===============");
-        for (ProductOrder item : receipt.getFreeItems()) {
+        for (ReceiptProduct item : receipt.getFreeItems()) {
             System.out.format("%-15s%-8d%n", item.getProductName(), item.getQuantity());
         }
 

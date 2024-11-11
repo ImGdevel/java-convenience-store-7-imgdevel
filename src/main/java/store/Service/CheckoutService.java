@@ -4,11 +4,11 @@ import store.domain.Order;
 import store.domain.Product;
 import store.domain.ProductOrder;
 import store.domain.Receipt;
+import store.domain.ReceiptProduct;
 import store.repository.InventoryManager;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CheckoutService {
 
@@ -51,14 +51,15 @@ public class CheckoutService {
     }
 
     private Receipt generateReceipt(Order order) {
-        int totalAmount = calculateTotalAmount(order.getTotalProductOrders());
-        int promotionDiscount = calculatePromotionDiscount(order.getPromotionalProductOrders());
+        List<ReceiptProduct> productOrders = mappingReceiptProduct(order.getTotalProductOrders());
+        List<ReceiptProduct> promotionalProductOrders = mappingReceiptProduct(order.getPromotionalProductOrders());
+        int totalAmount = calculateAmount(productOrders);
+        int promotionDiscount = calculateAmount(promotionalProductOrders);
         int membershipDiscount = calculateMembershipDiscount(order.isMembershipApplied(), totalAmount, promotionDiscount);
         int finalAmount = totalAmount - promotionDiscount - membershipDiscount;
-
         return new Receipt(
-                order.getTotalProductOrders(),
-                order.getPromotionalProductOrders(),
+                productOrders,
+                promotionalProductOrders,
                 totalAmount,
                 promotionDiscount,
                 membershipDiscount,
@@ -66,21 +67,18 @@ public class CheckoutService {
         );
     }
 
-    private int calculateTotalAmount(List<ProductOrder> totalOrders) {
-        return calculateAmount(totalOrders);
+    private  List<ReceiptProduct> mappingReceiptProduct(List<ProductOrder> orders){
+        List<ReceiptProduct> products = new ArrayList<>();
+        for(ProductOrder order : orders){
+            Product product = inventoryManager.getProduct(order.getProductName());
+
+            products.add(new ReceiptProduct(product.getName(), order.getQuantity(), product.getPrice()));
+        }
+        return products;
     }
 
-    private int calculatePromotionDiscount(List<ProductOrder> promoOrders) {
-        return calculateAmount(promoOrders);
-    }
-
-    private int calculateAmount(List<ProductOrder> orders) {
-        return orders.stream()
-            .mapToInt(order -> {
-                Product product = inventoryManager.getProduct(order.getProductName());
-                return order.getQuantity() * product.getPrice();
-            })
-            .sum();
+    private int calculateAmount(List<ReceiptProduct> orders) {
+        return orders.stream().mapToInt(order -> order.getTotalAmount()).sum();
     }
 
     private int calculateMembershipDiscount(boolean isMembershipApplied, int totalAmount, int promotionDiscount) {

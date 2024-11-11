@@ -5,6 +5,7 @@ import store.domain.ProductOrder;
 import store.domain.Receipt;
 import store.domain.ReceiptProduct;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class OutputView {
@@ -29,11 +30,14 @@ public class OutputView {
     }
 
     public void displayReceipt(Receipt receipt) {
+        DecimalFormat currencyFormat = new DecimalFormat("#,###");
+
         System.out.println("==============W 편의점================");
         System.out.format("%-15s%-8s%-8s%n", "상품명", "수량", "금액");
 
         for (ReceiptProduct item : receipt.getPurchasedItems()) {
-            System.out.format("%-15s%-8d%-8d%n", item.getProductName(), item.getQuantity(), item.getQuantity() * item.getPrice());
+            int totalItemPrice = item.getQuantity() * item.getPrice();
+            System.out.format("%-15s%-8d%-8s%n", item.getProductName(), item.getQuantity(), currencyFormat.format(totalItemPrice));
         }
 
         System.out.println("=============증 정===============");
@@ -42,10 +46,10 @@ public class OutputView {
         }
 
         System.out.println("====================================");
-        System.out.format("총구매액\t\t\t%d%n", receipt.getTotalAmount());
-        System.out.format("행사할인\t\t\t-%d%n", receipt.getPromotionDiscount());
-        System.out.format("멤버십할인\t\t-%d%n", receipt.getMembershipDiscount());
-        System.out.format("내실돈\t\t\t%d%n", receipt.getFinalAmount());
+        System.out.format("총구매액\t\t\t%s%n", currencyFormat.format(receipt.getTotalAmount()));
+        System.out.format("행사할인\t\t\t-%s%n", currencyFormat.format(receipt.getPromotionDiscount()));
+        System.out.format("멤버십할인\t\t-%s%n", currencyFormat.format(receipt.getMembershipDiscount()));
+        System.out.format("내실돈\t\t\t%s%n", currencyFormat.format(receipt.getFinalAmount()));
     }
 
     public void displayError(String message) {

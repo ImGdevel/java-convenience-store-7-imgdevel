@@ -34,6 +34,10 @@ public class ConvenienceStore {
     CheckoutService checkoutService;
 
     public ConvenienceStore(){
+        initializeComponents();
+    }
+
+    private void initializeComponents() {
         this.inputView = new InputView();
         this.outputView = new OutputView();
 
@@ -54,42 +58,9 @@ public class ConvenienceStore {
             outputView.displayWelcomeMessage();
             outputView.displayProductList(inventoryService.getProducts());
 
-            List<ProductOrder> orders = InputPurchase();
-            List<ProductOrder> promotionProduct = promotionService.getPromotionProduct(orders);
-
-            Order order = new Order(orders, promotionProduct); // 주문서 생성
-
-            List<ProductOrder> freePromotionProducts = promotionService.checkFreePromotionProduct(orders);
-            for(ProductOrder productOrder: freePromotionProducts){
-                String productName = productOrder.getProductName();
-                int quantity = productOrder.getQuantity();
-
-                outputView.displayPromotionSuggestion(productName, quantity);
-                boolean decisionInput = inputView.continueShopping();
-
-                if(decisionInput){
-                    order.addPromotionalProductOrder(productName, quantity);
-                }
-            }
-
-            List<ProductOrder> withoutPromoStock = promotionService.checkWithoutPromotionStock(orders);
-            for(ProductOrder productOrder: withoutPromoStock){
-                String productName = productOrder.getProductName();
-                int quantity = productOrder.getQuantity();
-                outputView.displayPromotionLimitWarning(productName, quantity);
-                boolean decisionInput = inputView.continueShopping();
-
-                if(!decisionInput){
-                    order.reduceTotalProductOrder(productName, quantity);
-                }
-            }
-
-            if(inputView.applyMembershipDiscount()){
-                order.setMembershipApplied(true);
-            }
-
-            Receipt receipt = checkoutService.processOrder(order);
-            outputView.displayReceipt(receipt);
+            Order order = createOrderWithPromotion();
+            applyMembershipDiscount(order);
+            processCheckout(order);
 
             if(!inputView.continueShopping()){
                 break;
@@ -97,7 +68,18 @@ public class ConvenienceStore {
         }
     }
 
-    private List<ProductOrder> InputPurchase(){
+    private Order createOrderWithPromotion() {
+        List<ProductOrder> orders = getProductOrders();
+        List<ProductOrder> promotionProducts = promotionService.getPromotionProduct(orders);
+        Order order = new Order(orders, promotionProducts);
+
+        suggestFreePromotion(order);
+        handlePromotionStockLimit(order);
+
+        return order;
+    }
+
+    private List<ProductOrder> getProductOrders(){
         while (true){
             try{
                 List<ProductOrder> orders = inputView.getProductOrders();
@@ -107,5 +89,40 @@ public class ConvenienceStore {
                 outputView.displayError(e.getMessage());
             }
         }
+    }
+
+    private void suggestFreePromotion(Order order) {
+        List<ProductOrder> freePromotionProducts = promotionService.checkFreePromotionProduct(order.getTotalProductOrders());
+        freePromotionProducts.forEach(productOrder -> suggestPromotion(order, productOrder));
+    }
+
+    private void suggestPromotion(Order order, ProductOrder productOrder) {
+        outputView.displayPromotionSuggestion(productOrder.getProductName(), productOrder.getQuantity());
+        if (inputView.continueShopping()) {
+            order.addPromotionalProductOrder(productOrder.getProductName(), productOrder.getQuantity());
+        }
+    }
+
+    private void handlePromotionStockLimit(Order order) {
+        List<ProductOrder> withoutPromoStock = promotionService.checkWithoutPromotionStock(order.getTotalProductOrders());
+        withoutPromoStock.forEach(productOrder -> handleStockLimit(order, productOrder));
+    }
+
+    private void handleStockLimit(Order order, ProductOrder productOrder) {
+        outputView.displayPromotionLimitWarning(productOrder.getProductName(), productOrder.getQuantity());
+        if (!inputView.continueShopping()) {
+            order.reduceTotalProductOrder(productOrder.getProductName(), productOrder.getQuantity());
+        }
+    }
+
+    private void applyMembershipDiscount(Order order) {
+        if(inputView.applyMembershipDiscount()) {
+            order.setMembershipApplied(true);
+        }
+    }
+
+    private void processCheckout(Order order) {
+        Receipt receipt = checkoutService.processOrder(order);
+        outputView.displayReceipt(receipt);
     }
 }

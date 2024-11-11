@@ -38,6 +38,30 @@ class ApplicationTest extends NsTest {
     }
 
     @Test
+    void 통합_테스트() {
+        assertSimpleTest(() -> {
+            run("[콜라-3],[에너지바-5]", "Y", "Y",
+                    "[콜라-10]","Y", "N", "Y",
+                    "[오렌지주스-1]", "Y", "Y", "N");
+            assertThat(output()).contains("- 콜라 1,000원 10개 탄산2+1");
+            assertThat(output()).contains("- 에너지바 2,000원 5개");
+            assertThat(output().replaceAll("\\s", "")).contains("행사할인-1,000");
+            assertThat(output().replaceAll("\\s", "")).contains("멤버십할인-3,000");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈9,000");
+
+            assertThat(output()).contains("- 콜라 1,000원 7개 탄산2+1");
+            assertThat(output()).contains("- 에너지바 2,000원 재고 없음");
+            assertThat(output().replaceAll("\\s", "")).contains("행사할인-2,000");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈8,000");
+
+            assertThat(output()).contains("- 콜라 1,000원 재고 없음 탄산2+1");
+            assertThat(output()).contains("- 콜라 1,000원 7개");
+            assertThat(output().replaceAll("\\s", "")).contains("행사할인-1,800");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈1,800");
+        });
+    }
+
+    @Test
     void 여러_개의_일반_상품_구매() {
         assertSimpleTest(() -> {
             run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "N");

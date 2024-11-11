@@ -76,6 +76,30 @@ class ApplicationTest extends NsTest {
             assertThat(output().replaceAll("\\s", "")).contains("내실돈6,000");
         });
     }
+
+    @Test
+    void 맴버십_할인_적용() {
+        assertSimpleTest(() -> {
+            run("[물-6]", "Y", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈2,100");
+        });
+    }
+
+    @Test
+    void 프로모션_할인_및_맴버십_할인_중복_적용() {
+        assertSimpleTest(() -> {
+            run("[콜라-3],[에너지바-5]", "Y", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈9,000");
+        });
+    }
+
+    @Test
+    void 프로모션_미수령_및_맴버십_미할인_중복_적용() {
+        assertSimpleTest(() -> {
+            run("[오렌지주스-1]", "Y", "Y", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈1,800");
+        });
+    }
     @Test
     void 기간에_해당하지_않는_프로모션_적용() {
         assertNowTest(() -> {

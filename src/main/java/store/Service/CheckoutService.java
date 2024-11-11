@@ -55,7 +55,7 @@ public class CheckoutService {
         List<ReceiptProduct> promotionalProductOrders = mappingReceiptProduct(order.getPromotionalProductOrders());
         int totalAmount = calculateAmount(productOrders);
         int promotionDiscount = calculateAmount(promotionalProductOrders);
-        int membershipDiscount = calculateMembershipDiscount(order.isMembershipApplied(), totalAmount, promotionDiscount);
+        int membershipDiscount = calculateMembershipDiscount(order.isMembershipApplied(),productOrders);
         int finalAmount = totalAmount - promotionDiscount - membershipDiscount;
         return new Receipt(
                 productOrders,
@@ -81,10 +81,17 @@ public class CheckoutService {
         return orders.stream().mapToInt(order -> order.getTotalAmount()).sum();
     }
 
-    private int calculateMembershipDiscount(boolean isMembershipApplied, int totalAmount, int promotionDiscount) {
+    private int calculateMembershipDiscount(boolean isMembershipApplied, List<ReceiptProduct> productOrders) {
         if (!isMembershipApplied) {
             return 0;
         }
-        return Math.min((totalAmount - promotionDiscount) * 30 / 100, 8000);
+
+        int nonPromotionAmount = productOrders.stream()
+            .filter(order -> !inventoryManager.getProduct(order.getProductName()).isPromotionAvailable())
+            .mapToInt(ReceiptProduct::getTotalAmount)
+            .sum();
+
+        return Math.min(nonPromotionAmount * 30 / 100, 8000);
     }
+
 }

@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,15 +60,19 @@ public class CheckoutServiceTest {
 
     @Test
     void 멤버십_할인_적용_테스트() {
-        ProductOrder orderA = new ProductOrder("사이다", 2);
-        Order order = new Order(Collections.singletonList(orderA), Collections.emptyList());
+        List<ProductOrder> productOrders = List.of(
+                new ProductOrder("콜라", 1),
+                new ProductOrder("사이다", 1),
+                new ProductOrder("물", 2)
+        );
+        Order order = new Order(productOrders, Collections.emptyList());
         order.setMembershipApplied(true);
 
         Receipt receipt = checkoutService.processOrder(order);
 
-        assertEquals(2000, receipt.getTotalAmount());
-        assertEquals(600, receipt.getMembershipDiscount());
-        assertEquals(1400, receipt.getFinalAmount());
+        assertEquals(3000, receipt.getTotalAmount());
+        assertEquals(300, receipt.getMembershipDiscount());
+        assertEquals(2700, receipt.getFinalAmount());
     }
 
     @Test
